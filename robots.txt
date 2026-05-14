@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://linresearchgroup-ncsu.github.io/sitemap.xml
