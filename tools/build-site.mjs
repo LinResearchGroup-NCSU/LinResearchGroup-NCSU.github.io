@@ -150,6 +150,24 @@ const teamData = {
   ],
 };
 
+const mediaPathOverrides = new Map([
+  [`${OLD_SITE}/files/2024/09/IMG_4217-1-1024x768.jpg`, "assets/media/team/lin-research-group-2024.jpg"],
+  [`${OLD_SITE}/files/2024/03/IMG_5475-150x150.jpeg`, "assets/media/team/xingcheng-lin.jpeg"],
+  [`${OLD_SITE}/files/2024/02/Yueyun-Li-.jpg`, "assets/media/team/yueyun-rina-li.jpg"],
+  [`${OLD_SITE}/files/2024/02/Picture1-150x150.jpg`, "assets/media/team/yafan-zhang.jpg"],
+  [
+    `${OLD_SITE}/files/2024/02/77726107-0836-45B0-9428-D2DBB894C3C5_1_105_c-150x150.jpeg`,
+    "assets/media/team/eduardo-cisneros.jpeg",
+  ],
+  [`${OLD_SITE}/files/2024/07/image-150x150.png`, "assets/media/team/irene-silvernail.png"],
+  [
+    `${OLD_SITE}/files/2025/12/e33e138afd3de58059d8537d5fcadbd4-683x1024.jpg`,
+    "assets/media/team/hexuan-hillbert-fan.jpg",
+  ],
+  [`${OLD_SITE}/files/2024/02/1690507289162-150x150.jpeg`, "assets/media/team/zahra-ghoreyshi.jpeg"],
+  [`${OLD_SITE}/files/2024/10/unnamed-150x150.jpg`, "assets/media/team/thomas-thornton.jpg"],
+]);
+
 function ensureDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
@@ -206,6 +224,8 @@ function trimSlash(url) {
 
 function mediaPathFromUrl(url) {
   const clean = url.split("?")[0];
+  const override = mediaPathOverrides.get(clean);
+  if (override) return override;
   const relative = clean.replace(`${OLD_SITE}/files/`, "");
   return `assets/media/${relative}`;
 }
