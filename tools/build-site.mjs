@@ -18,7 +18,7 @@ const localMedia = new Set();
 
 const nav = [
   ["Research", "/research/"],
-  ["Team", "/team/"],
+  ["Our Team", "/team/"],
   ["Publications", "/publications/"],
   ["Software", "/software/"],
   ["Teaching", "/teaching/"],
@@ -36,6 +36,119 @@ const pageRoutes = [
   ["team-photos", "Team Photos"],
   ["positions", "Positions"],
 ];
+
+const teamData = {
+  groupPhoto: "https://lingroup.wordpress.ncsu.edu/files/2024/09/IMG_4217-1-1024x768.jpg",
+  principalInvestigator: {
+    name: "Dr. Xingcheng Lin",
+    title: "Assistant Professor",
+    details: [
+      "Department of Physics",
+      "Bioinformatics Research Center",
+      "North Carolina State University",
+      "2401 Katharine Stinson Dr.",
+      "Riddick Hall, Raleigh, NC 27607",
+    ],
+    photo: "https://lingroup.wordpress.ncsu.edu/files/2024/03/IMG_5475-150x150.jpeg",
+  },
+  graduateStudents: [
+    {
+      name: "Yueyun (Rina) Li",
+      program: "2022 Physics",
+      email: "yli288@ncsu.edu",
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/02/Yueyun-Li-.jpg",
+    },
+    {
+      name: "Yafan Zhang",
+      program: "2023 Bioinformatics",
+      email: "yzhan326@ncsu.edu",
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/02/Picture1-150x150.jpg",
+    },
+    {
+      name: "Eduardo Cisneros",
+      program: "2023 Bioinformatics",
+      email: "eacisner@ncsu.edu",
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/02/77726107-0836-45B0-9428-D2DBB894C3C5_1_105_c-150x150.jpeg",
+    },
+    {
+      name: "Irene Silvernail",
+      program: "2023 Physics",
+      email: "insilver@ncsu.edu",
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/07/image-150x150.png",
+    },
+    {
+      name: "Hexuan (Hillbert) Fan",
+      program: "2025 Bioinformatics",
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2025/12/e33e138afd3de58059d8537d5fcadbd4-683x1024.jpg",
+    },
+    {
+      name: "Zahra Ghoreyshi",
+      program: "Biomedical Engineering at Texas A&M University",
+      note: 'Co-mentored with <a href="https://georgeresearchgroup.org" rel="noopener">Dr. Jason T. George</a>',
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/02/1690507289162-150x150.jpeg",
+    },
+  ],
+  undergraduateStudents: [
+    {
+      name: "Thomas Thornton",
+      program: "2022 Physics",
+      email: "trthorn3@ncsu.edu",
+      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/10/unnamed-150x150.jpg",
+    },
+  ],
+  visitingStudents: [],
+  alumni: [
+    {
+      name: "Xuan (Shawn) Liu",
+      information: "2021 Bioscience Undergraduate; Research period: 2025; Now M.S. in Bioengineering, Stanford University",
+      exitYear: "2025",
+    },
+    {
+      name: "Kaitlyn Khalawan",
+      information: "BioDynamics REU Student, 2022 Biological Sciences, State University of New York at Old Westbury; Research period: Summer 2025",
+      exitYear: "2025",
+    },
+    {
+      name: "Zhe Zhang",
+      information: "2022 Biological Science Visiting Student; Research period: Summer 2025",
+      exitYear: "2025",
+    },
+    {
+      name: "Chenshu Yang",
+      information: "2024 Bioscience Undergraduate; Research period: Summer 2025",
+      exitYear: "2025",
+    },
+    {
+      name: "Rushi Faldu",
+      information: "2022 Aerospace Engineering Undergraduate; Research period: 2024",
+      email: "rdfaldu@ncsu.edu",
+      exitYear: "2024",
+    },
+    {
+      name: "Jingru Yuan",
+      information: "2021 Bioengineering Visiting Student; Research period: Summer 2024",
+      exitYear: "2024",
+    },
+    {
+      name: "Aaron Norman",
+      information: "2023 Physics Undergraduate; Research period: Spring 2024",
+      email: "amnorma3@ncsu.edu",
+      exitYear: "2024",
+    },
+    {
+      name: "Althaf Hussain Salavudeen",
+      information: "2023 Physics Undergraduate; Research period: Spring 2024",
+      email: "asalavu@ncsu.edu",
+      exitYear: "2024",
+    },
+    {
+      name: "Meggie Cangu",
+      information: "2020 Human Biology Undergraduate; Research period: Spring 2024",
+      email: "mhcangu@ncsu.edu",
+      exitYear: "2024",
+    },
+  ],
+};
 
 function ensureDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -325,6 +438,109 @@ function buildContentPage(slug, title) {
       description: words(text, 26),
       bodyClass: className,
       pathName: `/${slug}/`,
+      children,
+    }),
+  );
+}
+
+function memberCard(member) {
+  const email = member.email
+    ? `<a class="member-email" href="mailto:${escapeHtml(member.email)}">${escapeHtml(member.email)}</a>`
+    : "";
+  const program = member.program ? `<p>${escapeHtml(member.program)}</p>` : "";
+  const note = member.note ? `<p class="member-note">${member.note}</p>` : "";
+
+  return `<article class="member-card">
+    <img src="${mediaUrlFromOld(member.photo)}" alt="${escapeHtml(member.name)}">
+    <h3>${escapeHtml(member.name)}</h3>
+    ${program}
+    ${email}
+    ${note}
+  </article>`;
+}
+
+function teamSection(title, members, emptyText = "No current members listed.") {
+  const body = members.length
+    ? `<div class="member-grid">${members.map(memberCard).join("")}</div>`
+    : `<p class="empty-team-row">${escapeHtml(emptyText)}</p>`;
+
+  return `<section class="team-section">
+    <h2>${escapeHtml(title)}</h2>
+    ${body}
+  </section>`;
+}
+
+function buildTeamPage() {
+  const pi = teamData.principalInvestigator;
+  const alumniByYear = new Map();
+  for (const alum of teamData.alumni) {
+    if (!alumniByYear.has(alum.exitYear)) alumniByYear.set(alum.exitYear, []);
+    alumniByYear.get(alum.exitYear).push(alum);
+  }
+
+  const alumniYears = [...alumniByYear.keys()].sort((a, b) => Number(b) - Number(a));
+  const alumniHtml = alumniYears
+    .map((year) => {
+      const items = alumniByYear
+        .get(year)
+        .map((alum) => {
+          const email = alum.email
+            ? `<a href="mailto:${escapeHtml(alum.email)}">${escapeHtml(alum.email)}</a>`
+            : "";
+          return `<li>
+            <strong>${escapeHtml(alum.name)}</strong>
+            <span>${escapeHtml(alum.information)}</span>
+            ${email}
+          </li>`;
+        })
+        .join("");
+
+      return `<section class="alumni-year">
+        <h3>${escapeHtml(year)}</h3>
+        <ul>${items}</ul>
+      </section>`;
+    })
+    .join("");
+
+  const children = `<section class="page-hero compact">
+    <p class="eyebrow">Lin Research Group</p>
+    <h1>Our Team</h1>
+    <p>Members of the Lin Research Group at North Carolina State University.</p>
+  </section>
+  <section class="team-layout">
+    <figure class="team-group-photo">
+      <img src="${mediaUrlFromOld(teamData.groupPhoto)}" alt="Lin Research Group members">
+    </figure>
+
+    <section class="team-section pi-section">
+      <h2>Principal Investigator</h2>
+      <article class="pi-card">
+        <img src="${mediaUrlFromOld(pi.photo)}" alt="${escapeHtml(pi.name)}">
+        <div>
+          <h3>${escapeHtml(pi.name)}</h3>
+          <p class="pi-title">${escapeHtml(pi.title)}</p>
+          <p>${pi.details.map(escapeHtml).join("<br>")}</p>
+        </div>
+      </article>
+    </section>
+
+    ${teamSection("Graduate Students", teamData.graduateStudents)}
+    ${teamSection("Undergraduate Student", teamData.undergraduateStudents)}
+    ${teamSection("Visiting Students", teamData.visitingStudents, "No current visiting students listed.")}
+
+    <section class="team-section alumni-section">
+      <h2>Lab Alumni</h2>
+      <div class="alumni-list">${alumniHtml}</div>
+    </section>
+  </section>`;
+
+  writeFile(
+    path.join(ROOT, "team", "index.html"),
+    shell({
+      title: "Our Team",
+      description: "Members, alumni, and collaborators of the Lin Research Group at NC State University.",
+      bodyClass: "team-page",
+      pathName: "/team/",
       children,
     }),
   );
@@ -772,30 +988,152 @@ img { display: block; max-width: 100%; height: auto; }
   border: 1px solid var(--line);
 }
 
-.team-page .wordpress-content > figure:first-child img {
+.team-layout {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem) clamp(4rem, 7vw, 6rem);
+}
+
+.team-group-photo {
+  margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--wash);
+}
+
+.team-group-photo img {
   width: 100%;
-  max-height: 520px;
+  max-height: 620px;
   object-fit: cover;
 }
 
-.team-page .wordpress-content figure:not(:first-child) {
-  float: left;
-  clear: left;
-  width: 150px;
-  margin: 0.25rem 1.1rem 1.1rem 0;
+.team-section {
+  padding-top: clamp(1.5rem, 4vw, 2.5rem);
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  border-top: 1px solid var(--line);
 }
 
-.team-page .wordpress-content figure:not(:first-child) img {
-  width: 150px;
-  height: 150px;
+.team-section h2 {
+  margin: 0 0 1.25rem;
+  color: var(--red-dark);
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  line-height: 1.15;
+}
+
+.pi-card {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+  align-items: center;
+  max-width: 820px;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--wash);
+}
+
+.pi-card img {
+  width: 240px;
+  height: 240px;
   object-fit: cover;
   border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
 }
 
-.team-page .wordpress-content figure:not(:first-child) + p {
-  min-height: 150px;
-  display: flex;
-  align-items: center;
+.pi-card h3,
+.member-card h3 {
+  margin: 0;
+  line-height: 1.18;
+}
+
+.pi-title {
+  margin: 0.35rem 0 0.9rem;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 1.5rem);
+}
+
+.member-card {
+  min-height: 100%;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.member-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--wash);
+  margin-bottom: 0.9rem;
+}
+
+.member-card p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.member-card .member-email {
+  display: inline-block;
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.member-note a { font-weight: 700; }
+
+.empty-team-row {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.alumni-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.alumni-year {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--wash);
+}
+
+.alumni-year h3 {
+  margin: 0;
+  color: var(--red-dark);
+  font-size: 1.4rem;
+}
+
+.alumni-year ul {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alumni-year li {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.alumni-year span {
+  color: var(--muted);
 }
 
 .photo-gallery {
@@ -877,7 +1215,8 @@ img { display: block; max-width: 100%; height: auto; }
   .topic-grid,
   .news-grid,
   .news-list,
-  .photo-gallery { grid-template-columns: 1fr 1fr; }
+  .photo-gallery,
+  .member-grid { grid-template-columns: 1fr 1fr; }
   .news-list .news-card { grid-template-columns: 1fr; }
 }
 
@@ -897,18 +1236,13 @@ img { display: block; max-width: 100%; height: auto; }
   .topic-grid,
   .news-grid,
   .news-list,
-  .photo-gallery { grid-template-columns: 1fr; }
+  .photo-gallery,
+  .member-grid { grid-template-columns: 1fr; }
   .section-heading { display: block; }
   .section-heading a { display: inline-block; margin-top: 0.8rem; }
-  .team-page .wordpress-content figure:not(:first-child) {
-    float: none;
-    width: 150px;
-    margin: 1rem 0 0.5rem;
-  }
-  .team-page .wordpress-content figure:not(:first-child) + p {
-    min-height: 0;
-    display: block;
-  }
+  .pi-card { grid-template-columns: 1fr; }
+  .pi-card img { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+  .alumni-year { grid-template-columns: 1fr; }
   .site-footer { display: block; }
   .site-footer a { display: block; margin: 0.65rem 0 0; }
 }
@@ -971,7 +1305,10 @@ function buildDownloadConfig() {
 
 buildAssets();
 buildHome();
-for (const [slug, title] of pageRoutes) buildContentPage(slug, title || pageTitle(slug));
+for (const [slug, title] of pageRoutes) {
+  if (slug === "team") buildTeamPage();
+  else buildContentPage(slug, title || pageTitle(slug));
+}
 buildNewsIndex();
 buildPostPages();
 buildSitemap();
