@@ -11,6 +11,7 @@ const HOME_INTRO =
 
 const pages = JSON.parse(fs.readFileSync(path.join(SOURCE, "pages.json"), "utf8"));
 const posts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
+const media = JSON.parse(fs.readFileSync(path.join(SOURCE, "media.json"), "utf8"));
 
 const pageBySlug = new Map(pages.map((page) => [page.slug, page]));
 const postByOldUrl = new Map(posts.map((post) => [trimSlash(post.link), `/news/${post.slug}/`]));
@@ -152,20 +153,34 @@ const teamData = {
 
 const mediaPathOverrides = new Map([
   [`${OLD_SITE}/files/2024/09/IMG_4217-1-1024x768.jpg`, "assets/media/team/lin-research-group-2024.jpg"],
+  [`${OLD_SITE}/files/2024/09/IMG_4217-1-scaled.jpg`, "assets/media/team/full/lin-research-group-2024.jpg"],
   [`${OLD_SITE}/files/2024/03/IMG_5475-150x150.jpeg`, "assets/media/team/xingcheng-lin.jpeg"],
+  [`${OLD_SITE}/files/2024/03/IMG_5475.jpeg`, "assets/media/team/full/xingcheng-lin.jpeg"],
   [`${OLD_SITE}/files/2024/02/Yueyun-Li-.jpg`, "assets/media/team/yueyun-rina-li.jpg"],
   [`${OLD_SITE}/files/2024/02/Picture1-150x150.jpg`, "assets/media/team/yafan-zhang.jpg"],
+  [`${OLD_SITE}/files/2024/02/Picture1.jpg`, "assets/media/team/full/yafan-zhang.jpg"],
   [
     `${OLD_SITE}/files/2024/02/77726107-0836-45B0-9428-D2DBB894C3C5_1_105_c-150x150.jpeg`,
     "assets/media/team/eduardo-cisneros.jpeg",
   ],
+  [
+    `${OLD_SITE}/files/2024/02/77726107-0836-45B0-9428-D2DBB894C3C5_1_105_c.jpeg`,
+    "assets/media/team/full/eduardo-cisneros.jpeg",
+  ],
   [`${OLD_SITE}/files/2024/07/image-150x150.png`, "assets/media/team/irene-silvernail.png"],
+  [`${OLD_SITE}/files/2024/07/image.png`, "assets/media/team/full/irene-silvernail.png"],
   [
     `${OLD_SITE}/files/2025/12/e33e138afd3de58059d8537d5fcadbd4-683x1024.jpg`,
     "assets/media/team/hexuan-hillbert-fan.jpg",
   ],
+  [
+    `${OLD_SITE}/files/2025/12/e33e138afd3de58059d8537d5fcadbd4-scaled.jpg`,
+    "assets/media/team/full/hexuan-hillbert-fan.jpg",
+  ],
   [`${OLD_SITE}/files/2024/02/1690507289162-150x150.jpeg`, "assets/media/team/zahra-ghoreyshi.jpeg"],
+  [`${OLD_SITE}/files/2024/02/1690507289162.jpeg`, "assets/media/team/full/zahra-ghoreyshi.jpeg"],
   [`${OLD_SITE}/files/2024/10/unnamed-150x150.jpg`, "assets/media/team/thomas-thornton.jpg"],
+  [`${OLD_SITE}/files/2024/10/unnamed.jpg`, "assets/media/team/full/thomas-thornton.jpg"],
 ]);
 
 function ensureDir(filePath) {
@@ -233,6 +248,40 @@ function mediaPathFromUrl(url) {
 function mediaUrlFromOld(url) {
   localMedia.add(url.split("?")[0]);
   return `/${mediaPathFromUrl(url)}`;
+}
+
+function largestMediaUrlFromOld(url) {
+  const target = url.split("?")[0];
+
+  for (const item of media) {
+    const knownUrls = new Set([item.source_url, item.guid?.rendered].filter(Boolean).map((value) => value.split("?")[0]));
+    for (const size of Object.values(item.media_details?.sizes || {})) {
+      if (size.source_url) knownUrls.add(size.source_url.split("?")[0]);
+    }
+    if (!knownUrls.has(target)) continue;
+
+    const candidates = [
+      {
+        sourceUrl: item.source_url,
+        width: item.media_details?.width || 0,
+        height: item.media_details?.height || 0,
+      },
+      ...Object.values(item.media_details?.sizes || {}).map((size) => ({
+        sourceUrl: size.source_url,
+        width: size.width || 0,
+        height: size.height || 0,
+      })),
+    ].filter((candidate) => candidate.sourceUrl);
+
+    candidates.sort((a, b) => b.width * b.height - a.width * a.height);
+    return candidates[0]?.sourceUrl || url;
+  }
+
+  return url;
+}
+
+function fullMediaUrlFromOld(url) {
+  return mediaUrlFromOld(largestMediaUrlFromOld(url));
 }
 
 function firstImage(html = "") {
@@ -533,6 +582,12 @@ function buildPhotoGalleryPage(title) {
   );
 }
 
+function photoLightboxLink({ thumb, full = thumb, alt, className = "" }) {
+  return `<a class="team-photo-link ${className}" href="${full}" data-photo-full="${full}" data-photo-alt="${escapeHtml(alt)}">
+    <img src="${thumb}" alt="${escapeHtml(alt)}">
+  </a>`;
+}
+
 function memberCard(member) {
   const email = member.email
     ? `<a class="member-email" href="mailto:${escapeHtml(member.email)}">${escapeHtml(member.email)}</a>`
@@ -541,7 +596,12 @@ function memberCard(member) {
   const note = member.note ? `<p class="member-note">${member.note}</p>` : "";
 
   return `<article class="member-card">
-    <img src="${mediaUrlFromOld(member.photo)}" alt="${escapeHtml(member.name)}">
+    ${photoLightboxLink({
+      thumb: mediaUrlFromOld(member.photo),
+      full: fullMediaUrlFromOld(member.photo),
+      alt: member.name,
+      className: "member-photo-link",
+    })}
     <h3>${escapeHtml(member.name)}</h3>
     ${program}
     ${email}
@@ -599,13 +659,23 @@ function buildTeamPage() {
   </section>
   <section class="team-layout">
     <figure class="team-group-photo">
-      <img src="${mediaUrlFromOld(teamData.groupPhoto)}" alt="Lin Research Group members">
+      ${photoLightboxLink({
+        thumb: mediaUrlFromOld(teamData.groupPhoto),
+        full: fullMediaUrlFromOld(teamData.groupPhoto),
+        alt: "Lin Research Group members",
+        className: "group-photo-link",
+      })}
     </figure>
 
     <section class="team-section pi-section">
       <h2>Principal Investigator</h2>
       <article class="pi-card">
-        <img src="${mediaUrlFromOld(pi.photo)}" alt="${escapeHtml(pi.name)}">
+        ${photoLightboxLink({
+          thumb: mediaUrlFromOld(pi.photo),
+          full: fullMediaUrlFromOld(pi.photo),
+          alt: pi.name,
+          className: "pi-photo-link",
+        })}
         <div>
           <h3>${escapeHtml(pi.name)}</h3>
           <p class="pi-title">${escapeHtml(pi.title)}</p>
@@ -1099,6 +1169,25 @@ body.lightbox-open { overflow: hidden; }
   object-fit: cover;
 }
 
+.team-photo-link {
+  display: block;
+  cursor: zoom-in;
+}
+
+.team-photo-link img {
+  transition: transform 180ms ease;
+}
+
+.team-photo-link:hover img,
+.team-photo-link:focus-visible img {
+  transform: scale(1.03);
+}
+
+.team-photo-link:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
 .team-section {
   padding-top: clamp(1.5rem, 4vw, 2.5rem);
   margin-top: clamp(1.5rem, 4vw, 2.5rem);
@@ -1131,6 +1220,16 @@ body.lightbox-open { overflow: hidden; }
   border-radius: 8px;
   border: 1px solid var(--line);
   background: #fff;
+}
+
+.pi-photo-link {
+  width: 240px;
+  height: 240px;
+}
+
+.pi-photo-link img {
+  width: 100%;
+  height: 100%;
 }
 
 .pi-card h3,
@@ -1167,6 +1266,14 @@ body.lightbox-open { overflow: hidden; }
   border: 1px solid var(--line);
   background: var(--wash);
   margin-bottom: 0.9rem;
+}
+
+.member-photo-link {
+  margin-bottom: 0.9rem;
+}
+
+.member-photo-link img {
+  margin-bottom: 0;
 }
 
 .member-card p {
@@ -1410,6 +1517,7 @@ body.lightbox-open { overflow: hidden; }
   .section-heading { display: block; }
   .section-heading a { display: inline-block; margin-top: 0.8rem; }
   .pi-card { grid-template-columns: 1fr; }
+  .pi-photo-link { width: 100%; height: auto; aspect-ratio: 1 / 1; }
   .pi-card img { width: 100%; height: auto; aspect-ratio: 1 / 1; }
   .alumni-year { grid-template-columns: 1fr; }
   .site-footer { display: block; }

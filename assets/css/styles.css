@@ -405,6 +405,25 @@ body.lightbox-open { overflow: hidden; }
   object-fit: cover;
 }
 
+.team-photo-link {
+  display: block;
+  cursor: zoom-in;
+}
+
+.team-photo-link img {
+  transition: transform 180ms ease;
+}
+
+.team-photo-link:hover img,
+.team-photo-link:focus-visible img {
+  transform: scale(1.03);
+}
+
+.team-photo-link:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
 .team-section {
   padding-top: clamp(1.5rem, 4vw, 2.5rem);
   margin-top: clamp(1.5rem, 4vw, 2.5rem);
@@ -437,6 +456,16 @@ body.lightbox-open { overflow: hidden; }
   border-radius: 8px;
   border: 1px solid var(--line);
   background: #fff;
+}
+
+.pi-photo-link {
+  width: 240px;
+  height: 240px;
+}
+
+.pi-photo-link img {
+  width: 100%;
+  height: 100%;
 }
 
 .pi-card h3,
@@ -473,6 +502,14 @@ body.lightbox-open { overflow: hidden; }
   border: 1px solid var(--line);
   background: var(--wash);
   margin-bottom: 0.9rem;
+}
+
+.member-photo-link {
+  margin-bottom: 0.9rem;
+}
+
+.member-photo-link img {
+  margin-bottom: 0;
 }
 
 .member-card p {
@@ -716,6 +753,7 @@ body.lightbox-open { overflow: hidden; }
   .section-heading { display: block; }
   .section-heading a { display: inline-block; margin-top: 0.8rem; }
   .pi-card { grid-template-columns: 1fr; }
+  .pi-photo-link { width: 100%; height: auto; aspect-ratio: 1 / 1; }
   .pi-card img { width: 100%; height: auto; aspect-ratio: 1 / 1; }
   .alumni-year { grid-template-columns: 1fr; }
   .site-footer { display: block; }
