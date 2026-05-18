@@ -463,6 +463,76 @@ function buildContentPage(slug, title) {
   );
 }
 
+function htmlAttr(tag, name) {
+  const match = tag.match(new RegExp(`\\s${name}=["']([^"']*)["']`, "i"));
+  return match ? decodeHtml(match[1]) : "";
+}
+
+function largestSrc(src, srcset) {
+  if (!srcset) return src;
+  const candidates = srcset
+    .split(",")
+    .map((item) => {
+      const [url, descriptor = ""] = item.trim().split(/\s+/);
+      const width = descriptor.endsWith("w") ? Number.parseInt(descriptor, 10) : 0;
+      return { url, width };
+    })
+    .filter((candidate) => candidate.url);
+
+  if (!candidates.length) return src;
+  candidates.sort((a, b) => b.width - a.width);
+  return candidates[0].url;
+}
+
+function buildPhotoGalleryPage(title) {
+  const page = pageBySlug.get("team-photos");
+  if (!page) throw new Error("Missing WordPress page: team-photos");
+
+  const photos = [...page.content.rendered.matchAll(/<img\b[^>]*>/gi)].map((match, index) => {
+    const tag = match[0];
+    const src = htmlAttr(tag, "src");
+    const srcset = htmlAttr(tag, "srcset");
+    const alt = htmlAttr(tag, "alt") || `Team photo ${index + 1}`;
+    return {
+      alt,
+      full: mediaUrlFromOld(largestSrc(src, srcset)),
+      thumb: mediaUrlFromOld(src),
+    };
+  });
+
+  const gallery = photos
+    .map(
+      (photo) => `<figure class="photo-gallery-item">
+        <a href="${photo.full}" data-photo-full="${photo.full}" data-photo-alt="${escapeHtml(photo.alt)}">
+          <img src="${photo.thumb}" alt="${escapeHtml(photo.alt)}">
+        </a>
+      </figure>`,
+    )
+    .join("");
+
+  const children = `<section class="page-hero compact">
+    <p class="eyebrow">Lin Research Group</p>
+    <h1>${escapeHtml(title)}</h1>
+    <p>Group moments from the Lin Research Group.</p>
+  </section>
+  <section class="page-shell">
+    <article class="photo-gallery">
+      ${gallery}
+    </article>
+  </section>`;
+
+  writeFile(
+    path.join(ROOT, "team-photos", "index.html"),
+    shell({
+      title,
+      description: "Group photos from the Lin Research Group at NC State University.",
+      bodyClass: "team-photos-page",
+      pathName: "/team-photos/",
+      children,
+    }),
+  );
+}
+
 function memberCard(member) {
   const email = member.email
     ? `<a class="member-email" href="mailto:${escapeHtml(member.email)}">${escapeHtml(member.email)}</a>`
@@ -652,6 +722,7 @@ a { color: var(--red-dark); text-decoration-thickness: 0.08em; text-underline-of
 a:hover { color: var(--red); }
 
 img { display: block; max-width: 100%; height: auto; }
+body.lightbox-open { overflow: hidden; }
 
 .skip-link {
   position: absolute;
@@ -1169,6 +1240,34 @@ img { display: block; max-width: 100%; height: auto; }
   overflow: hidden;
   border-radius: 8px;
   border: 1px solid var(--line);
+  background: var(--wash);
+}
+
+.photo-gallery a {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: zoom-in;
+}
+
+.photo-gallery a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.36));
+  transition: opacity 160ms ease;
+}
+
+.photo-gallery a:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
+.photo-gallery a:hover::after,
+.photo-gallery a:focus-visible::after {
+  opacity: 1;
 }
 
 .photo-gallery figure img {
@@ -1177,6 +1276,56 @@ img { display: block; max-width: 100%; height: auto; }
   object-fit: cover;
   border: 0;
   border-radius: 0;
+  transition: transform 180ms ease;
+}
+
+.photo-gallery a:hover img,
+.photo-gallery a:focus-visible img {
+  transform: scale(1.035);
+}
+
+.photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: rgba(10, 16, 26, 0.9);
+}
+
+.photo-lightbox.open {
+  display: flex;
+}
+
+.photo-lightbox img {
+  width: auto;
+  max-width: 100%;
+  max-height: 86vh;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.photo-lightbox-close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.photo-lightbox-close:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 .news-list {
@@ -1280,6 +1429,62 @@ if (toggle && nav) {
     toggle.setAttribute("aria-expanded", String(open));
   });
 }
+
+const photoLinks = Array.from(document.querySelectorAll("[data-photo-full]"));
+
+if (photoLinks.length) {
+  const lightbox = document.createElement("div");
+  const image = document.createElement("img");
+  const close = document.createElement("button");
+  let previousFocus = null;
+
+  lightbox.className = "photo-lightbox";
+  lightbox.setAttribute("role", "dialog");
+  lightbox.setAttribute("aria-modal", "true");
+  lightbox.setAttribute("aria-hidden", "true");
+
+  close.type = "button";
+  close.className = "photo-lightbox-close";
+  close.textContent = "Close";
+
+  lightbox.append(image, close);
+  document.body.append(lightbox);
+
+  const closeLightbox = () => {
+    lightbox.classList.remove("open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("lightbox-open");
+    image.removeAttribute("src");
+    if (previousFocus) previousFocus.focus();
+  };
+
+  const openLightbox = (src, alt) => {
+    previousFocus = document.activeElement;
+    image.src = src;
+    image.alt = alt || "";
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.classList.add("lightbox-open");
+    close.focus();
+  };
+
+  for (const link of photoLinks) {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      openLightbox(link.dataset.photoFull || link.href, link.dataset.photoAlt || "");
+    });
+  }
+
+  close.addEventListener("click", closeLightbox);
+
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox) closeLightbox();
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
+  });
+}
 `,
   );
 
@@ -1327,6 +1532,7 @@ buildAssets();
 buildHome();
 for (const [slug, title] of pageRoutes) {
   if (slug === "team") buildTeamPage();
+  else if (slug === "team-photos") buildPhotoGalleryPage(title || pageTitle(slug));
   else buildContentPage(slug, title || pageTitle(slug));
 }
 buildNewsIndex();
