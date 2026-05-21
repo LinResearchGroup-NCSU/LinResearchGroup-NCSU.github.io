@@ -3,6 +3,7 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const SOURCE = path.join(ROOT, "source", "wordpress");
+const LOCAL_NEWS_SOURCE = path.join(ROOT, "source", "news");
 const SITE_URL = "https://linresearchgroup-ncsu.github.io";
 const OLD_SITE = "https://lingroup.wordpress.ncsu.edu";
 const FILE_RE = /https:\/\/lingroup\.wordpress\.ncsu\.edu\/files\/[^"'()\s<>]+/g;
@@ -10,11 +11,11 @@ const HOME_INTRO =
   "Our research group is situated within the Department of Physics and the Bioinformatics Research Center of North Carolina State University. By synergizing simulation and data-driven approaches, we are committed to building innovative computational models to answer crucial questions in the realm of genome and epigenome.";
 
 const pages = JSON.parse(fs.readFileSync(path.join(SOURCE, "pages.json"), "utf8"));
-const posts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
+const wordpressPosts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
 const media = JSON.parse(fs.readFileSync(path.join(SOURCE, "media.json"), "utf8"));
 
 const pageBySlug = new Map(pages.map((page) => [page.slug, page]));
-const postByOldUrl = new Map(posts.map((post) => [trimSlash(post.link), `/news/${post.slug}/`]));
+const postByOldUrl = new Map(wordpressPosts.map((post) => [trimSlash(post.link), `/news/${post.slug}/`]));
 const localMedia = new Set();
 
 const nav = [
@@ -183,6 +184,8 @@ const mediaPathOverrides = new Map([
   [`${OLD_SITE}/files/2024/10/unnamed.jpg`, "assets/media/team/full/thomas-thornton.jpg"],
 ]);
 
+const posts = [...loadLocalNewsPosts(), ...wordpressPosts].sort((a, b) => new Date(b.date) - new Date(a.date));
+
 function ensureDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
@@ -217,6 +220,120 @@ function escapeHtml(value = "") {
     .replace(/"/g, "&quot;");
 }
 
+function slugify(value = "") {
+  return decodeHtml(value)
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
+function parseFrontMatter(filePath) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!match) throw new Error(`Missing front matter in local news post: ${filePath}`);
+
+  const data = {};
+  for (const line of match[1].split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+
+    const separator = trimmed.indexOf(":");
+    if (separator === -1) continue;
+
+    const key = trimmed.slice(0, separator).trim();
+    let value = trimmed.slice(separator + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (value === "true") data[key] = true;
+    else if (value === "false") data[key] = false;
+    else data[key] = value;
+  }
+
+  return { data, markdown: match[2].trim() };
+}
+
+function renderInlineMarkdown(value = "") {
+  return escapeHtml(value)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g, '<a href="$2" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+function markdownToHtml(markdown = "") {
+  const blocks = markdown.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  return blocks
+    .map((block) => {
+      if (block.startsWith("### ")) return `<h3>${renderInlineMarkdown(block.slice(4))}</h3>`;
+      if (block.startsWith("## ")) return `<h2>${renderInlineMarkdown(block.slice(3))}</h2>`;
+      if (block.startsWith("# ")) return `<h2>${renderInlineMarkdown(block.slice(2))}</h2>`;
+      if (/^- /m.test(block)) {
+        const items = block
+          .split(/\r?\n/)
+          .filter((line) => line.trim().startsWith("- "))
+          .map((line) => `<li>${renderInlineMarkdown(line.trim().slice(2))}</li>`)
+          .join("");
+        return `<ul>${items}</ul>`;
+      }
+      return `<p>${renderInlineMarkdown(block.replace(/\r?\n/g, " "))}</p>`;
+    })
+    .join("\n");
+}
+
+function normalizeLocalDate(value = "") {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T12:00:00`;
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return `${value}:00`;
+  return value || new Date().toISOString().slice(0, 19);
+}
+
+function loadLocalNewsPosts() {
+  const postsDir = path.join(LOCAL_NEWS_SOURCE, "posts");
+  if (!fs.existsSync(postsDir)) return [];
+
+  return fs
+    .readdirSync(postsDir)
+    .filter((fileName) => fileName.endsWith(".md") && !fileName.startsWith("_"))
+    .map((fileName) => {
+      const filePath = path.join(postsDir, fileName);
+      const { data, markdown } = parseFrontMatter(filePath);
+      if (data.draft) return null;
+
+      const title = data.title || path.basename(fileName, ".md");
+      const slug = data.slug || slugify(title);
+      const date = normalizeLocalDate(data.date);
+      const description = data.description || words(stripTags(markdownToHtml(markdown)), 34);
+      const image = data.image || "";
+      const imageAlt = data.imageAlt || title;
+      const imageHtml = image
+        ? `<figure class="wp-block-image size-large"><img src="${mediaUrlFromOld(image)}" alt="${escapeHtml(imageAlt)}"></figure>`
+        : "";
+      const bodyHtml = markdownToHtml(markdown || description);
+      const content = `${imageHtml}\n${bodyHtml}`;
+
+      return {
+        id: `local-${slug}`,
+        date,
+        date_gmt: date,
+        modified: date,
+        modified_gmt: date,
+        slug,
+        status: "publish",
+        type: "post",
+        link: `${SITE_URL}/news/${slug}/`,
+        title: { rendered: title },
+        content: { rendered: content, protected: false },
+        excerpt: { rendered: `<p>${escapeHtml(description)}</p>`, protected: false },
+        local: true,
+      };
+    })
+    .filter(Boolean);
+}
+
 function stripTags(html = "") {
   return decodeHtml(
     html
@@ -239,6 +356,10 @@ function trimSlash(url) {
 
 function mediaPathFromUrl(url) {
   const clean = url.split("?")[0];
+  if (clean.startsWith("/assets/media/")) return clean.slice(1);
+  if (clean.startsWith("assets/media/")) return clean;
+  if (clean.startsWith(`${SITE_URL}/assets/media/`)) return clean.replace(`${SITE_URL}/`, "");
+
   const override = mediaPathOverrides.get(clean);
   if (override) return override;
   const relative = clean.replace(`${OLD_SITE}/files/`, "");
@@ -246,8 +367,19 @@ function mediaPathFromUrl(url) {
 }
 
 function mediaUrlFromOld(url) {
-  localMedia.add(url.split("?")[0]);
-  return `/${mediaPathFromUrl(url)}`;
+  const clean = url.split("?")[0];
+  if (
+    clean.startsWith("/assets/media/") ||
+    clean.startsWith("assets/media/") ||
+    clean.startsWith(`${SITE_URL}/assets/media/`)
+  ) {
+    return `/${mediaPathFromUrl(clean)}`;
+  }
+
+  if (!clean.startsWith(`${OLD_SITE}/files/`)) return url;
+
+  localMedia.add(clean);
+  return `/${mediaPathFromUrl(clean)}`;
 }
 
 function largestMediaUrlFromOld(url) {
@@ -451,7 +583,7 @@ function buildHome() {
 
   <section class="overview-band">
     <div class="metric"><strong>3</strong><span>Research themes</span></div>
-    <div class="metric"><strong>${posts.length}</strong><span>News updates imported</span></div>
+    <div class="metric"><strong>${posts.length}</strong><span>News updates</span></div>
     <div class="metric"><strong>6</strong><span>Software repositories</span></div>
   </section>
 
@@ -711,7 +843,7 @@ function buildNewsIndex() {
   const children = `<section class="page-hero compact">
     <p class="eyebrow">News</p>
     <h1>Group Updates</h1>
-    <p>Announcements, publications, presentations, awards, and group milestones imported from the original WordPress site.</p>
+    <p>Announcements, publications, presentations, awards, and group milestones from the Lin Research Group.</p>
   </section>
   <section class="page-shell">
     <div class="news-list">${cards}</div>
