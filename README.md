@@ -10,29 +10,39 @@ https://lingroup.wordpress.ncsu.edu/
 
 - `index.html` is the home page.
 - `research/`, `team/`, `publications/`, `software/`, `teaching/`, `team-photos/`, and `positions/` are static section pages.
-- `news/` contains the imported news index and individual news posts.
+- `news/` contains generated news HTML pages that GitHub Pages serves.
 - `assets/css/styles.css` and `assets/js/main.js` contain the site styling and mobile navigation behavior.
 - `assets/media/` contains locally downloaded WordPress images used by the pages.
 - `source/wordpress/` stores the WordPress API export used for this migration.
-- `source/news/` stores hand-authored news posts that are independent from WordPress.
+- `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
 - `tools/build-site.mjs` regenerates the static pages from the WordPress export and local news posts.
 
 ## Adding News Without WordPress
 
 1. Copy `source/news/posts/_new-post-template.md` to `source/news/posts/YYYY-MM-DD-short-slug.md`.
-2. Copy the news image into `assets/media/news/YYYY/MM/your-image.jpg`.
-3. Edit the front matter at the top of the new Markdown file:
+2. Keep the new Markdown file inside `source/news/posts/`. Files placed directly in `source/news/` are ignored by the build.
+3. Copy the news image into `assets/media/news/YYYY/MM/your-image.jpg`.
+4. Edit the front matter at the top of the new Markdown file:
    - `title` is the post title.
    - `date` controls the post order.
    - `slug` becomes the URL at `/news/your-slug/`.
    - `description` appears on the News index.
    - `image` should point to the local image path, such as `/assets/media/news/2026/05/your-image.jpg`.
    - `imageAlt` describes the image for accessibility.
-4. Set `draft: false` when the post is ready to publish.
-5. Rebuild the site from the repository root:
+5. Set `draft: false` when the post is ready to publish.
+6. Rebuild the generated HTML from the repository root:
 
 ```bash
 node tools/build-site.mjs
+```
+
+7. Commit and push both the Markdown source file and the generated HTML changes:
+
+```bash
+git status
+git add .
+git commit -m "Add news post"
+git push
 ```
 
 Local Markdown posts are combined with the older imported WordPress news posts automatically. You do not need to edit `source/wordpress/posts.json` for new posts.
