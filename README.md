@@ -19,7 +19,7 @@ https://lingroup.wordpress.ncsu.edu/
 
 ## Adding News Without WordPress
 
-1. Copy `source/news/new-post-template.md` to `source/news/posts/YYYY-MM-DD-short-slug.md`.
+1. Copy `source/news/posts/_new-post-template.md` to `source/news/posts/YYYY-MM-DD-short-slug.md`.
 2. Copy the news image into `assets/media/news/YYYY/MM/your-image.jpg`.
 3. Edit the front matter at the top of the new Markdown file:
    - `title` is the post title.
