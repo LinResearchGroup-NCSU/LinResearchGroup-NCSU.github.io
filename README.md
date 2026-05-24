@@ -15,6 +15,7 @@ https://lingroup.wordpress.ncsu.edu/
 - `assets/media/` contains locally downloaded WordPress images used by the pages.
 - `source/wordpress/` stores the WordPress API export used for this migration.
 - `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
+- `source/team-photos.json` stores the local Photos gallery entries.
 - `tools/build-site.mjs` regenerates the static pages from the WordPress export and local news posts.
 
 ## Adding News Without WordPress
@@ -46,6 +47,36 @@ git push
 ```
 
 Local Markdown posts are combined with the older imported WordPress news posts automatically. You do not need to edit `source/wordpress/posts.json` for new posts.
+
+## Adding Team Photos
+
+1. Copy the photo into the repository. For new gallery-only images, use a path such as `assets/media/team-photos/YYYY/MM/photo-name.jpg`. If the image already exists elsewhere under `assets/media/`, reuse that path instead of duplicating it.
+2. Add an entry to `source/team-photos.json`:
+
+```json
+{
+  "image": "/assets/media/team-photos/2026/05/photo-name.jpg",
+  "alt": "Short description of the photo"
+}
+```
+
+3. Keep the JSON list comma-separated and valid. The newest or preferred photos should go near the top of the list.
+4. Rebuild the generated HTML from the repository root:
+
+```bash
+node tools/build-site.mjs
+```
+
+5. Commit and push the image, `source/team-photos.json`, and the generated `team-photos/index.html` change:
+
+```bash
+git status
+git add .
+git commit -m "Add team photos"
+git push
+```
+
+The Photos page combines entries from `source/team-photos.json` with the older imported WordPress gallery.
 
 ## Updating From WordPress Export
 

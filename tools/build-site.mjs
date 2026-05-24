@@ -13,6 +13,7 @@ const HOME_INTRO =
 const pages = JSON.parse(fs.readFileSync(path.join(SOURCE, "pages.json"), "utf8"));
 const wordpressPosts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
 const media = JSON.parse(fs.readFileSync(path.join(SOURCE, "media.json"), "utf8"));
+const localTeamPhotos = JSON.parse(fs.readFileSync(path.join(ROOT, "source", "team-photos.json"), "utf8"));
 
 const pageBySlug = new Map(pages.map((page) => [page.slug, page]));
 const postByOldUrl = new Map(wordpressPosts.map((post) => [trimSlash(post.link), `/news/${post.slug}/`]));
@@ -669,7 +670,7 @@ function buildPhotoGalleryPage(title) {
   const page = pageBySlug.get("team-photos");
   if (!page) throw new Error("Missing WordPress page: team-photos");
 
-  const photos = [...page.content.rendered.matchAll(/<img\b[^>]*>/gi)].map((match, index) => {
+  const importedPhotos = [...page.content.rendered.matchAll(/<img\b[^>]*>/gi)].map((match, index) => {
     const tag = match[0];
     const src = htmlAttr(tag, "src");
     const srcset = htmlAttr(tag, "srcset");
@@ -679,6 +680,24 @@ function buildPhotoGalleryPage(title) {
       full: mediaUrlFromOld(largestSrc(src, srcset)),
       thumb: mediaUrlFromOld(src),
     };
+  });
+
+  const localPhotos = localTeamPhotos.map((photo, index) => {
+    const image = photo.image || photo.thumb || photo.full;
+    const alt = photo.alt || `Team photo ${index + 1}`;
+    return {
+      alt,
+      full: mediaUrlFromOld(photo.full || image),
+      thumb: mediaUrlFromOld(photo.thumb || image),
+    };
+  });
+
+  const seenPhotos = new Set();
+  const photos = [...localPhotos, ...importedPhotos].filter((photo) => {
+    const key = photo.full || photo.thumb;
+    if (!key || seenPhotos.has(key)) return false;
+    seenPhotos.add(key);
+    return true;
   });
 
   const gallery = photos
