@@ -488,14 +488,14 @@ function shell({ title, description, bodyClass = "", children, pathName = "/" })
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${canonical}">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/media/Genome.png" type="image/png">
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body class="${bodyClass}">
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Lin Research Group home">
-      <span class="brand-mark">LRG</span>
+      <span class="brand-mark"><img src="/assets/media/Genome.png" alt="" aria-hidden="true"></span>
       <span class="brand-text">
         <strong>Lin Research Group</strong>
         <small>NC State University</small>
@@ -965,12 +965,21 @@ body.lightbox-open { overflow: hidden; }
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 2.7rem;
-  height: 2.7rem;
-  border-radius: 8px;
-  background: var(--red);
-  color: white;
-  font-weight: 800;
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid rgba(24, 32, 42, 0.16);
+  border-radius: 50%;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(24, 32, 42, 0.1);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  padding: 0.12rem;
+  object-fit: contain;
 }
 
 .brand-text { display: grid; line-height: 1.15; }
@@ -1729,14 +1738,6 @@ if (photoLinks.length) {
   );
 
   writeFile(path.join(ROOT, ".nojekyll"), "");
-  writeFile(
-    path.join(ROOT, "favicon.svg"),
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#cc0000"/>
-  <text x="32" y="39" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="800" fill="#fff">LRG</text>
-</svg>
-`,
-  );
   writeFile(
     path.join(ROOT, "robots.txt"),
     `User-agent: *
