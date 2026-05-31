@@ -7,7 +7,7 @@ slug: "semester-end-celebration"
 description: "We celebrated the end of the semester with an escape room party. Thank you all for your achievements and contributions!"
 image: "/assets/media/news/2026/05/semester-end-celebration.jpg"
 imageAlt: "Escape room party gathering"
-draft: true
+draft: false
 ---
 
 We celebrated the end of the semester with an escape room party. Thank you all for your achievements and contributions. We look forward to the summer ahead!
