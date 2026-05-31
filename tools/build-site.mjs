@@ -520,7 +520,7 @@ function shell({ title, description, bodyClass = "", children, pathName = "/" })
     <div>
       <a href="https://physics.sciences.ncsu.edu/" rel="noopener">NC State Physics</a>
       <a href="https://brc.ncsu.edu/" rel="noopener">Bioinformatics Research Center</a>
-      <a href="https://scholar.google.com/citations?user=PS_CX0AAAAAJ" rel="noopener">Google Scholar</a>
+      <a href="https://scholar.google.com/citations?user=lqXpVdQAAAAJ&hl=en" rel="noopener">Google Scholar</a>
     </div>
   </footer>
   <script src="/assets/js/main.js"></script>
