@@ -6,6 +6,7 @@ const SOURCE = path.join(ROOT, "source", "wordpress");
 const LOCAL_NEWS_SOURCE = path.join(ROOT, "source", "news");
 const SITE_URL = "https://linresearchgroup-ncsu.github.io";
 const OLD_SITE = "https://lingroup.wordpress.ncsu.edu";
+const MAP_MY_VISITORS_URL = "https://mapmyvisitors.com/globe.js?d=6fC7ULDbp06GfZAJ4jHHrdEZEh30CY4vV7sabnfElBE";
 const FILE_RE = /https:\/\/lingroup\.wordpress\.ncsu\.edu\/files\/[^"'()\s<>]+/g;
 const HOME_INTRO =
   "Our research group is situated within the Department of Physics and the Bioinformatics Research Center of North Carolina State University. By synergizing simulation and data-driven approaches, we are committed to building innovative computational models to answer crucial questions in the realm of genome and epigenome.";
@@ -524,6 +525,7 @@ function shell({ title, description, bodyClass = "", children, pathName = "/" })
     </div>
   </footer>
   <script src="/assets/js/main.js"></script>
+  <script type="text/javascript" id="mmvst_globe" src="${MAP_MY_VISITORS_URL}"></script>
 </body>
 </html>
 `;
