@@ -6,7 +6,7 @@ const SOURCE = path.join(ROOT, "source", "wordpress");
 const LOCAL_NEWS_SOURCE = path.join(ROOT, "source", "news");
 const SITE_URL = "https://linresearchgroup-ncsu.github.io";
 const OLD_SITE = "https://lingroup.wordpress.ncsu.edu";
-const MAP_MY_VISITORS_URL = "https://mapmyvisitors.com/map.js?d=1QVpVId2s0vj0MstGU2ytefeH5ibsbIG7fjqQ1xwTzw&cl=ffffff&w=a";
+const MAP_MY_VISITORS_SCRIPT_URL = "https://mapmyvisitors.com/map.js?d=1QVpVId2s0vj0MstGU2ytefeH5ibsbiG7fjqQ1xwTzw";
 const FILE_RE = /https:\/\/lingroup\.wordpress\.ncsu\.edu\/files\/[^"'()\s<>]+/g;
 const HOME_INTRO =
   "Our research group is situated within the Department of Physics and the Bioinformatics Research Center of North Carolina State University. By synergizing simulation and data-driven approaches, we are committed to building innovative computational models to answer crucial questions in the realm of genome and epigenome.";
@@ -523,9 +523,11 @@ function shell({ title, description, bodyClass = "", children, pathName = "/" })
       <a href="https://brc.ncsu.edu/" rel="noopener">Bioinformatics Research Center</a>
       <a href="https://scholar.google.com/citations?user=lqXpVdQAAAAJ&hl=en" rel="noopener">Google Scholar</a>
     </div>
+    <div class="visitor-tracker">
+      <script type="text/javascript" id="mapmyvisitors" src="${MAP_MY_VISITORS_SCRIPT_URL}"></script>
+    </div>
   </footer>
   <script src="/assets/js/main.js"></script>
-  <script type="text/javascript" id="mapmyvisitors" src="${MAP_MY_VISITORS_URL}"></script>
 </body>
 </html>
 `;
@@ -1633,6 +1635,16 @@ body.lightbox-open { overflow: hidden; }
 
 .site-footer p { margin: 0.35rem 0 0; }
 .site-footer a { color: #fff; margin-left: 1rem; font-weight: 700; }
+.site-footer .visitor-tracker {
+  flex: 0 0 180px;
+  align-self: center;
+  width: 180px;
+  min-height: 114px;
+  margin-left: 0;
+}
+.site-footer .visitor-tracker a {
+  margin-left: 0;
+}
 
 @media (max-width: 980px) {
   .nav-toggle { display: grid; }
@@ -1684,6 +1696,7 @@ body.lightbox-open { overflow: hidden; }
   .alumni-year { grid-template-columns: 1fr; }
   .site-footer { display: block; }
   .site-footer a { display: block; margin: 0.65rem 0 0; }
+  .site-footer .visitor-tracker { margin-top: 1rem; }
 }
 `,
   );
