@@ -7,6 +7,7 @@ slug: "lin-receives-nsf-career-award"
 description: "The Lin group received an NSF CAREER Award supporting research on epigenetic principles underlying chromatin organization and liquid-liquid phase separation."
 image: "/assets/media/news/2026/05/lin-receives-nsf-career-award.png"
 imageAlt: "National Science Foundation logo"
+includeImageInPhotos: false
 draft: false
 ---
 

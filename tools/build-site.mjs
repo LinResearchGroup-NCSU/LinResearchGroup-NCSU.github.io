@@ -311,6 +311,7 @@ function loadLocalNewsPosts() {
       const description = data.description || words(stripTags(markdownToHtml(markdown)), 34);
       const image = data.image || "";
       const imageAlt = data.imageAlt || title;
+      const includeImageInPhotos = data.includeImageInPhotos !== false;
       const imageHtml = image
         ? `<figure class="wp-block-image size-large"><img src="${mediaUrlFromOld(image)}" alt="${escapeHtml(imageAlt)}"></figure>`
         : "";
@@ -331,6 +332,9 @@ function loadLocalNewsPosts() {
         content: { rendered: content, protected: false },
         excerpt: { rendered: `<p>${escapeHtml(description)}</p>`, protected: false },
         local: true,
+        localImage: image,
+        localImageAlt: imageAlt,
+        localImageInPhotos: includeImageInPhotos,
       };
     })
     .filter(Boolean);
@@ -696,8 +700,20 @@ function buildPhotoGalleryPage(title) {
     };
   });
 
+  const localNewsPhotos = posts
+    .filter((post) => post.local && post.localImage && post.localImageInPhotos)
+    .map((post) => {
+      const title = decodeHtml(post.title.rendered || "News photo");
+      const image = mediaUrlFromOld(post.localImage);
+      return {
+        alt: post.localImageAlt || title,
+        full: image,
+        thumb: image,
+      };
+    });
+
   const seenPhotos = new Set();
-  const photos = [...localPhotos, ...importedPhotos].filter((photo) => {
+  const photos = [...localNewsPhotos, ...localPhotos, ...importedPhotos].filter((photo) => {
     const key = photo.full || photo.thumb;
     if (!key || seenPhotos.has(key)) return false;
     seenPhotos.add(key);

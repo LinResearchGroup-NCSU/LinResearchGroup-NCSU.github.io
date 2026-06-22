@@ -2,6 +2,10 @@
 
 Static GitHub Pages site for the Lin Research Group at NC State University.
 
+Group website:
+
+https://linresearchgroup-ncsu.github.io/
+
 The current site was generated from the former WordPress site at:
 
 https://lingroup.wordpress.ncsu.edu/
@@ -15,8 +19,8 @@ https://lingroup.wordpress.ncsu.edu/
 - `assets/media/` contains locally downloaded WordPress images used by the pages.
 - `source/wordpress/` stores the WordPress API export used for this migration.
 - `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
-- `source/team-photos.json` stores the local Photos gallery entries.
-- `tools/build-site.mjs` regenerates the static pages from the WordPress export and local news posts.
+- `source/team-photos.json` stores local Photos gallery entries for photos that are not attached to a news post.
+- `tools/build-site.mjs` regenerates the static pages from the WordPress export, local news posts, and local photo entries.
 
 ## Adding News Without WordPress
 
@@ -30,6 +34,7 @@ https://lingroup.wordpress.ncsu.edu/
    - `description` appears on the News index.
    - `image` should point to the local image path, such as `/assets/media/news/2026/05/your-image.jpg`.
    - `imageAlt` describes the image for accessibility.
+   - `includeImageInPhotos` should usually be `true` for event and group photos. Set it to `false` for logos, diagrams, or images that should only appear in the News post.
 5. Set `draft: false` when the post is ready to publish.
 6. Rebuild the generated HTML from the repository root:
 
@@ -37,7 +42,7 @@ https://lingroup.wordpress.ncsu.edu/
 node tools/build-site.mjs
 ```
 
-7. Commit and push both the Markdown source file and the generated HTML changes:
+7. Commit and push the Markdown source file, the image, and the generated HTML changes:
 
 ```bash
 git status
@@ -48,9 +53,13 @@ git push
 
 Local Markdown posts are combined with the older imported WordPress news posts automatically. You do not need to edit `source/wordpress/posts.json` for new posts.
 
+News images are also added to the Photos page automatically during the build when `includeImageInPhotos: true`. If a photo is attached to a news post, do not duplicate it in `source/team-photos.json`.
+
 ## Adding Team Photos
 
-1. Copy the photo into the repository. For new gallery-only images, use a path such as `assets/media/team-photos/YYYY/MM/photo-name.jpg`. If the image already exists elsewhere under `assets/media/`, reuse that path instead of duplicating it.
+News post images are included in the Photos page automatically. Use these steps only for gallery-only photos that do not belong to a news post.
+
+1. Copy the photo into the repository. For gallery-only images, use a path such as `assets/media/team-photos/YYYY/MM/photo-name.jpg`. If the image already exists elsewhere under `assets/media/`, reuse that path instead of duplicating it.
 2. Add an entry to `source/team-photos.json`:
 
 ```json
@@ -76,7 +85,7 @@ git commit -m "Add team photos"
 git push
 ```
 
-The Photos page combines entries from `source/team-photos.json` with the older imported WordPress gallery.
+The Photos page combines news-post images, entries from `source/team-photos.json`, and the older imported WordPress gallery.
 
 ## Updating From WordPress Export
 
