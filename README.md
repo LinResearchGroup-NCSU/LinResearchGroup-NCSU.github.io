@@ -30,6 +30,7 @@ https://lingroup.wordpress.ncsu.edu/
 3. Keep the numbering newest-to-oldest within each section. If a preprint becomes peer reviewed, move it from `Preprints:` to `Peer-reviewed Publications:` and renumber both sections.
 4. Follow the existing HTML style:
    - Use `<strong>Xingcheng Lin</strong>` to bold the group PI.
+   - Link the paper title to the DOI URL, such as `<a href="https://doi.org/10.xxxx/...">Paper title</a>`.
    - Add `*` after corresponding authors.
    - Use `&dagger;` for shared authorship.
    - Write DOI entries as `DOI: 10.xxxx/...`.
