@@ -17,10 +17,36 @@ https://lingroup.wordpress.ncsu.edu/
 - `news/` contains generated news HTML pages that GitHub Pages serves.
 - `assets/css/styles.css` and `assets/js/main.js` contain the site styling and mobile navigation behavior.
 - `assets/media/` contains locally downloaded WordPress images used by the pages.
+- `source/pages/publications.html` stores the locally maintained Publications page content.
 - `source/wordpress/` stores the WordPress API export used for this migration.
 - `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
 - `source/team-photos.json` stores local Photos gallery entries for photos that are not attached to a news post.
-- `tools/build-site.mjs` regenerates the static pages from the WordPress export, local news posts, and local photo entries.
+- `tools/build-site.mjs` regenerates the static pages from the WordPress export, local page overrides, local news posts, and local photo entries.
+
+## Updating Publications
+
+1. Edit `source/pages/publications.html`.
+2. Add new papers near the top of the correct section, usually `Preprints:` or `Peer-reviewed Publications:`.
+3. Keep the numbering newest-to-oldest within each section. If a preprint becomes peer reviewed, move it from `Preprints:` to `Peer-reviewed Publications:` and renumber both sections.
+4. Follow the existing HTML style:
+   - Use `<strong>Xingcheng Lin</strong>` to bold the group PI.
+   - Add `*` after corresponding authors.
+   - Use `&dagger;` for shared authorship.
+   - Write DOI entries as `DOI: 10.xxxx/...`.
+5. Rebuild the generated HTML from the repository root:
+
+```bash
+node tools/build-site.mjs
+```
+
+6. Commit and push both the source page and the generated Publications page:
+
+```bash
+git status
+git add source/pages/publications.html publications/index.html
+git commit -m "Update publications"
+git push
+```
 
 ## Adding News Without WordPress
 

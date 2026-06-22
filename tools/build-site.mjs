@@ -3,6 +3,7 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const SOURCE = path.join(ROOT, "source", "wordpress");
+const LOCAL_PAGES_SOURCE = path.join(ROOT, "source", "pages");
 const LOCAL_NEWS_SOURCE = path.join(ROOT, "source", "news");
 const SITE_URL = "https://linresearchgroup-ncsu.github.io";
 const OLD_SITE = "https://lingroup.wordpress.ncsu.edu";
@@ -206,6 +207,12 @@ function decodeHtml(value = "") {
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
+    .replace(/&dagger;/g, "\u2020")
+    .replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"')
+    .replace(/&ndash;/g, "-")
+    .replace(/&alpha;/g, "\u03b1")
+    .replace(/&beta;/g, "\u03b2")
     .replace(/&#8217;/g, "'")
     .replace(/&#8220;/g, '"')
     .replace(/&#8221;/g, '"')
@@ -454,6 +461,11 @@ function rewriteLinks(html = "") {
 }
 
 function pageContent(slug) {
+  const localPagePath = path.join(LOCAL_PAGES_SOURCE, `${slug}.html`);
+  if (fs.existsSync(localPagePath)) {
+    return rewriteLinks(fs.readFileSync(localPagePath, "utf8"));
+  }
+
   const page = pageBySlug.get(slug);
   if (!page) throw new Error(`Missing WordPress page: ${slug}`);
   return rewriteLinks(page.content.rendered || "");
