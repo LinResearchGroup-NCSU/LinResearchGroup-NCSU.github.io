@@ -8,4 +8,4 @@ imageAlt: "Rina Li presenting at the 2026 Southeast Symposium on Genome Integrit
 draft: false
 ---
 
-The Lin Group attended the [2026 Southeast Symposium on Genome Integrity and Chromatin Regulation](https://biology.charlotte.edu/ssgicr/) at UNC Charlotte. Rina Li presented her work on chromatin epigenetic modifications, and Irene Silvernail received a poster award. Congratulations to Rina and Irene on representing the group so well!
+The Lin Group attended the [2026 Southeast Symposium on Genome Integrity and Chromatin Regulation](https://biology.charlotte.edu/ssgicr/) at UNC Charlotte. Rina Li presented her work on chromatin epigenetic modifications, and Irene Silvernail received a poster award. Congratulations!
