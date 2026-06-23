@@ -690,6 +690,19 @@ function buildPhotoGalleryPage(title) {
   const page = pageBySlug.get("team-photos");
   if (!page) throw new Error("Missing WordPress page: team-photos");
 
+  const newsMetadataForSlug = (slug) => {
+    if (!slug) return {};
+    const post = posts.find((candidate) => candidate.slug === slug);
+    if (!post) throw new Error(`Missing news post for team photo: ${slug}`);
+
+    const newsTitle = decodeHtml(post.title.rendered || "News photo");
+    return {
+      newsTitle,
+      newsDescription: stripTags(post.excerpt.rendered || ""),
+      newsUrl: `/news/${post.slug}/`,
+    };
+  };
+
   const importedPhotos = [...page.content.rendered.matchAll(/<img\b[^>]*>/gi)].map((match, index) => {
     const tag = match[0];
     const src = htmlAttr(tag, "src");
@@ -709,6 +722,7 @@ function buildPhotoGalleryPage(title) {
       alt,
       full: mediaUrlFromOld(photo.full || image),
       thumb: mediaUrlFromOld(photo.thumb || image),
+      ...newsMetadataForSlug(photo.newsSlug),
     };
   });
 
@@ -721,9 +735,7 @@ function buildPhotoGalleryPage(title) {
         alt: post.localImageAlt || title,
         full: image,
         thumb: image,
-        newsTitle: title,
-        newsDescription: stripTags(post.excerpt.rendered || ""),
-        newsUrl: `/news/${post.slug}/`,
+        ...newsMetadataForSlug(post.slug),
       };
     });
 
