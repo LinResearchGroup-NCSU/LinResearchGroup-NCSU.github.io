@@ -721,6 +721,9 @@ function buildPhotoGalleryPage(title) {
         alt: post.localImageAlt || title,
         full: image,
         thumb: image,
+        newsTitle: title,
+        newsDescription: stripTags(post.excerpt.rendered || ""),
+        newsUrl: `/news/${post.slug}/`,
       };
     });
 
@@ -733,13 +736,27 @@ function buildPhotoGalleryPage(title) {
   });
 
   const gallery = photos
-    .map(
-      (photo) => `<figure class="photo-gallery-item">
-        <a href="${photo.full}" data-photo-full="${photo.full}" data-photo-alt="${escapeHtml(photo.alt)}">
-          <img src="${photo.thumb}" alt="${escapeHtml(photo.alt)}">
+    .map((photo) => {
+      const newsAttributes = [
+        photo.newsTitle ? `data-news-title="${escapeHtml(photo.newsTitle)}"` : "",
+        photo.newsDescription ? `data-news-description="${escapeHtml(photo.newsDescription)}"` : "",
+        photo.newsUrl ? `data-news-url="${escapeHtml(photo.newsUrl)}"` : "",
+        photo.newsTitle ? `title="${escapeHtml(photo.newsTitle)}"` : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      const newsCaption = photo.newsTitle
+        ? `\n          <span class="photo-news-caption">${escapeHtml(photo.newsTitle)}</span>`
+        : "";
+      const itemClass = photo.newsTitle ? "photo-gallery-item has-news" : "photo-gallery-item";
+      const newsAttributeText = newsAttributes ? ` ${newsAttributes}` : "";
+
+      return `<figure class="${itemClass}">
+        <a href="${photo.full}" data-photo-full="${photo.full}" data-photo-alt="${escapeHtml(photo.alt)}"${newsAttributeText}>
+          <img src="${photo.thumb}" alt="${escapeHtml(photo.alt)}">${newsCaption}
         </a>
-      </figure>`,
-    )
+      </figure>`;
+    })
     .join("");
 
   const children = `<section class="page-hero compact">
@@ -1555,6 +1572,7 @@ body.lightbox-open { overflow: hidden; }
   position: absolute;
   inset: 0;
   opacity: 0;
+  pointer-events: none;
   background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.36));
   transition: opacity 160ms ease;
 }
@@ -1583,6 +1601,30 @@ body.lightbox-open { overflow: hidden; }
   transform: scale(1.035);
 }
 
+.photo-news-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: block;
+  padding: 0.8rem 0.9rem;
+  color: #fff;
+  font-weight: 850;
+  line-height: 1.25;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, rgba(10, 16, 26, 0), rgba(10, 16, 26, 0.82));
+  opacity: 0;
+  transform: translateY(0.8rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.photo-gallery a:hover .photo-news-caption,
+.photo-gallery a:focus-visible .photo-news-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .photo-lightbox {
   position: fixed;
   inset: 0;
@@ -1598,14 +1640,53 @@ body.lightbox-open { overflow: hidden; }
   display: flex;
 }
 
+.photo-lightbox-frame {
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  width: min(100%, 1180px);
+  max-height: 90vh;
+  margin: 0;
+}
+
 .photo-lightbox img {
   width: auto;
   max-width: 100%;
-  max-height: 86vh;
+  max-height: 74vh;
   object-fit: contain;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.photo-lightbox-caption {
+  width: min(100%, 860px);
+  padding: 0.95rem 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--ink);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+
+.photo-lightbox-caption[hidden] {
+  display: none;
+}
+
+.photo-lightbox-caption h2 {
+  margin: 0;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.22;
+}
+
+.photo-lightbox-caption p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.photo-lightbox-caption a {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  font-weight: 850;
 }
 
 .photo-lightbox-close {
@@ -1745,7 +1826,12 @@ const photoLinks = Array.from(document.querySelectorAll("[data-photo-full]"));
 
 if (photoLinks.length) {
   const lightbox = document.createElement("div");
+  const frame = document.createElement("figure");
   const image = document.createElement("img");
+  const caption = document.createElement("figcaption");
+  const captionTitle = document.createElement("h2");
+  const captionDescription = document.createElement("p");
+  const captionLink = document.createElement("a");
   const close = document.createElement("button");
   let previousFocus = null;
 
@@ -1753,12 +1839,20 @@ if (photoLinks.length) {
   lightbox.setAttribute("role", "dialog");
   lightbox.setAttribute("aria-modal", "true");
   lightbox.setAttribute("aria-hidden", "true");
+  lightbox.setAttribute("aria-label", "Photo preview");
+
+  frame.className = "photo-lightbox-frame";
+  caption.className = "photo-lightbox-caption";
+  caption.hidden = true;
+  captionLink.textContent = "Read the news post";
+  caption.append(captionTitle, captionDescription, captionLink);
+  frame.append(image, caption);
 
   close.type = "button";
   close.className = "photo-lightbox-close";
   close.textContent = "Close";
 
-  lightbox.append(image, close);
+  lightbox.append(frame, close);
   document.body.append(lightbox);
 
   const closeLightbox = () => {
@@ -1766,13 +1860,27 @@ if (photoLinks.length) {
     lightbox.setAttribute("aria-hidden", "true");
     document.body.classList.remove("lightbox-open");
     image.removeAttribute("src");
+    caption.hidden = true;
+    captionTitle.textContent = "";
+    captionDescription.textContent = "";
+    captionLink.removeAttribute("href");
     if (previousFocus) previousFocus.focus();
   };
 
-  const openLightbox = (src, alt) => {
+  const openLightbox = (link) => {
+    const newsTitle = link.dataset.newsTitle || "";
+    const newsDescription = link.dataset.newsDescription || "";
+    const newsUrl = link.dataset.newsUrl || "";
     previousFocus = document.activeElement;
-    image.src = src;
-    image.alt = alt || "";
+    image.src = link.dataset.photoFull || link.href;
+    image.alt = link.dataset.photoAlt || "";
+    captionTitle.textContent = newsTitle;
+    captionDescription.textContent = newsDescription;
+    captionDescription.hidden = !newsDescription;
+    captionLink.hidden = !newsUrl;
+    if (newsUrl) captionLink.href = newsUrl;
+    else captionLink.removeAttribute("href");
+    caption.hidden = !newsTitle && !newsDescription && !newsUrl;
     lightbox.classList.add("open");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.classList.add("lightbox-open");
@@ -1782,7 +1890,7 @@ if (photoLinks.length) {
   for (const link of photoLinks) {
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      openLightbox(link.dataset.photoFull || link.href, link.dataset.photoAlt || "");
+      openLightbox(link);
     });
   }
 

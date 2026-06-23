@@ -608,6 +608,7 @@ body.lightbox-open { overflow: hidden; }
   position: absolute;
   inset: 0;
   opacity: 0;
+  pointer-events: none;
   background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.36));
   transition: opacity 160ms ease;
 }
@@ -636,6 +637,30 @@ body.lightbox-open { overflow: hidden; }
   transform: scale(1.035);
 }
 
+.photo-news-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: block;
+  padding: 0.8rem 0.9rem;
+  color: #fff;
+  font-weight: 850;
+  line-height: 1.25;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, rgba(10, 16, 26, 0), rgba(10, 16, 26, 0.82));
+  opacity: 0;
+  transform: translateY(0.8rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.photo-gallery a:hover .photo-news-caption,
+.photo-gallery a:focus-visible .photo-news-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .photo-lightbox {
   position: fixed;
   inset: 0;
@@ -651,14 +676,53 @@ body.lightbox-open { overflow: hidden; }
   display: flex;
 }
 
+.photo-lightbox-frame {
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  width: min(100%, 1180px);
+  max-height: 90vh;
+  margin: 0;
+}
+
 .photo-lightbox img {
   width: auto;
   max-width: 100%;
-  max-height: 86vh;
+  max-height: 74vh;
   object-fit: contain;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.photo-lightbox-caption {
+  width: min(100%, 860px);
+  padding: 0.95rem 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--ink);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+
+.photo-lightbox-caption[hidden] {
+  display: none;
+}
+
+.photo-lightbox-caption h2 {
+  margin: 0;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.22;
+}
+
+.photo-lightbox-caption p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.photo-lightbox-caption a {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  font-weight: 850;
 }
 
 .photo-lightbox-close {
