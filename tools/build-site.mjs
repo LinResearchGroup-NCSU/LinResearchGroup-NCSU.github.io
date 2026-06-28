@@ -95,14 +95,37 @@ const teamData = {
   ],
   undergraduateStudents: [
     {
-      name: "Thomas Thornton",
-      program: "2022 Physics",
-      email: "trthorn3@ncsu.edu",
-      photo: "https://lingroup.wordpress.ncsu.edu/files/2024/10/unnamed-150x150.jpg",
+      name: "Charlie Krapf",
+      program: "2026 Engineering",
+      photo: "/assets/media/team/nc-state-wolfpack-logo.png",
+      photoFit: "contain",
     },
   ],
-  visitingStudents: [],
+  visitingStudents: [
+    {
+      name: "Magnolia Myers",
+      program: "2024 Chemistry and Data Science, Allegheny College",
+      photo: "/assets/media/team/nc-state-wolfpack-logo.png",
+      photoFit: "contain",
+    },
+  ],
+  highSchoolStudents: [
+    {
+      name: "Aharshi Bhattacharjee",
+      photo: "/assets/media/team/aharshi-bhattacharjee.png",
+    },
+  ],
   alumni: [
+    {
+      name: "Thomas Thornton",
+      information: "2022 Physics Undergraduate; Research period: 2023-2026; Now Ph.D. in Physics, Northwestern University",
+      exitYear: "2026",
+    },
+    {
+      name: "Longcheng Sun",
+      information: "2023 Biological Sciences Undergraduate; Research period: 2026",
+      exitYear: "2026",
+    },
     {
       name: "Xuan (Shawn) Liu",
       information: "2021 Bioscience Undergraduate; Research period: 2025; Now M.S. in Bioengineering, Stanford University",
@@ -806,18 +829,23 @@ function memberCard(member) {
     : "";
   const program = member.program ? `<p>${escapeHtml(member.program)}</p>` : "";
   const note = member.note ? `<p class="member-note">${member.note}</p>` : "";
+  const photoClass = ["member-photo-link", member.photoFit === "contain" ? "logo-photo-link" : ""]
+    .filter(Boolean)
+    .join(" ");
+  const detailsHtml = [program, email, note]
+    .filter(Boolean)
+    .map((item) => `    ${item}`)
+    .join("\n");
 
   return `<article class="member-card">
     ${photoLightboxLink({
       thumb: mediaUrlFromOld(member.photo),
       full: fullMediaUrlFromOld(member.photo),
       alt: member.name,
-      className: "member-photo-link",
+      className: photoClass,
     })}
     <h3>${escapeHtml(member.name)}</h3>
-    ${program}
-    ${email}
-    ${note}
+${detailsHtml ? `${detailsHtml}\n` : ""}
   </article>`;
 }
 
@@ -849,10 +877,10 @@ function buildTeamPage() {
           const email = alum.email
             ? `<a href="mailto:${escapeHtml(alum.email)}">${escapeHtml(alum.email)}</a>`
             : "";
+          const emailHtml = email ? `\n            ${email}` : "";
           return `<li>
             <strong>${escapeHtml(alum.name)}</strong>
-            <span>${escapeHtml(alum.information)}</span>
-            ${email}
+            <span>${escapeHtml(alum.information)}</span>${emailHtml}
           </li>`;
         })
         .join("");
@@ -899,6 +927,7 @@ function buildTeamPage() {
     ${teamSection("Graduate Students", teamData.graduateStudents)}
     ${teamSection("Undergraduate Student", teamData.undergraduateStudents)}
     ${teamSection("Visiting Students", teamData.visitingStudents, "No current visiting students listed.")}
+    ${teamSection("High-school Students", teamData.highSchoolStudents, "No current high-school students listed.")}
 
     <section class="team-section alumni-section">
       <h2>Lab Alumni</h2>
@@ -1495,6 +1524,12 @@ body.lightbox-open { overflow: hidden; }
 
 .member-photo-link img {
   margin-bottom: 0;
+}
+
+.logo-photo-link img {
+  object-fit: contain;
+  padding: 1rem;
+  background: #fff;
 }
 
 .member-card p {

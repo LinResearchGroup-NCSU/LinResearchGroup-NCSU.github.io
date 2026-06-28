@@ -521,6 +521,12 @@ body.lightbox-open { overflow: hidden; }
   margin-bottom: 0;
 }
 
+.logo-photo-link img {
+  object-fit: contain;
+  padding: 1rem;
+  background: #fff;
+}
+
 .member-card p {
   margin: 0.35rem 0 0;
   color: var(--muted);
