@@ -1792,14 +1792,10 @@ body.lightbox-open { overflow: hidden; }
 .site-footer p { margin: 0.35rem 0 0; }
 .site-footer a { color: #fff; margin-left: 1rem; font-weight: 700; }
 .site-footer .visitor-tracker {
-  flex: 0 0 180px;
-  align-self: center;
-  width: 180px;
-  min-height: 114px;
-  margin-left: 0;
+  display: none !important;
 }
-.site-footer .visitor-tracker a {
-  margin-left: 0;
+#mapmyvisitors-widget {
+  display: none !important;
 }
 
 @media (max-width: 980px) {
@@ -1852,7 +1848,6 @@ body.lightbox-open { overflow: hidden; }
   .alumni-year { grid-template-columns: 1fr; }
   .site-footer { display: block; }
   .site-footer a { display: block; margin: 0.65rem 0 0; }
-  .site-footer .visitor-tracker { margin-top: 1rem; }
 }
 `,
   );
