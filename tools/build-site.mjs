@@ -98,6 +98,7 @@ const teamData = {
       name: "Charlie Krapf",
       program: "2026 Engineering",
       photo: "/assets/media/team/charlie-krapf.jpeg",
+      linkedin: "https://www.linkedin.com/in/charlie-krapf-2b27b03b2/",
     },
   ],
   visitingStudents: [
@@ -826,12 +827,15 @@ function memberCard(member) {
   const email = member.email
     ? `<a class="member-email" href="mailto:${escapeHtml(member.email)}">${escapeHtml(member.email)}</a>`
     : "";
+  const linkedin = member.linkedin
+    ? `<a class="member-linkedin" href="${escapeHtml(member.linkedin)}" rel="noopener">LinkedIn</a>`
+    : "";
   const program = member.program ? `<p>${escapeHtml(member.program)}</p>` : "";
   const note = member.note ? `<p class="member-note">${member.note}</p>` : "";
   const photoClass = ["member-photo-link", member.photoFit === "contain" ? "logo-photo-link" : ""]
     .filter(Boolean)
     .join(" ");
-  const detailsHtml = [program, email, note]
+  const detailsHtml = [linkedin, program, email, note]
     .filter(Boolean)
     .map((item) => `    ${item}`)
     .join("\n");
@@ -1536,7 +1540,8 @@ body.lightbox-open { overflow: hidden; }
   color: var(--muted);
 }
 
-.member-card .member-email {
+.member-card .member-email,
+.member-card .member-linkedin {
   display: inline-block;
   margin-top: 0.35rem;
   overflow-wrap: anywhere;

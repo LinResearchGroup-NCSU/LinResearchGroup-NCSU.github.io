@@ -532,7 +532,8 @@ body.lightbox-open { overflow: hidden; }
   color: var(--muted);
 }
 
-.member-card .member-email {
+.member-card .member-email,
+.member-card .member-linkedin {
   display: inline-block;
   margin-top: 0.35rem;
   overflow-wrap: anywhere;
