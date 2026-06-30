@@ -97,8 +97,7 @@ const teamData = {
     {
       name: "Charlie Krapf",
       program: "2026 Engineering",
-      photo: "/assets/media/team/nc-state-wolfpack-logo.png",
-      photoFit: "contain",
+      photo: "/assets/media/team/charlie-krapf.jpeg",
     },
   ],
   visitingStudents: [
