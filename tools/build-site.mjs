@@ -11,6 +11,7 @@ const MAP_MY_VISITORS_SCRIPT_URL = "https://mapmyvisitors.com/map.js?d=1QVpVId2s
 const FILE_RE = /https:\/\/lingroup\.wordpress\.ncsu\.edu\/files\/[^"'()\s<>]+/g;
 const HOME_INTRO =
   "Our research group is situated within the Department of Physics and the Bioinformatics Research Center of North Carolina State University. By synergizing simulation and data-driven approaches, we are committed to building innovative computational models to answer crucial questions in the realm of genome and epigenome.";
+const SOFTWARE_REPOSITORY_COUNT = 5;
 
 const pages = JSON.parse(fs.readFileSync(path.join(SOURCE, "pages.json"), "utf8"));
 const wordpressPosts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
@@ -628,7 +629,7 @@ function buildHome() {
   <section class="overview-band">
     <div class="metric"><strong>3</strong><span>Research themes</span></div>
     <div class="metric"><strong>${posts.length}</strong><span>News updates</span></div>
-    <div class="metric"><strong>6</strong><span>Software repositories</span></div>
+    <div class="metric"><strong>${SOFTWARE_REPOSITORY_COUNT}</strong><span>Software repositories</span></div>
   </section>
 
   <section class="content-section">
@@ -1402,6 +1403,97 @@ body.lightbox-open { overflow: hidden; }
   border: 1px solid var(--line);
 }
 
+.software-page .wordpress-content {
+  max-width: 1020px;
+}
+
+.software-intro {
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.software-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.software-card {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  min-height: 100%;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(24, 32, 42, 0.06);
+}
+
+.software-icon {
+  display: grid;
+  place-items: center;
+  width: 6rem;
+  height: 6rem;
+  border: 1px solid rgba(24, 32, 42, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  text-decoration: none;
+  background: var(--wash);
+}
+
+.software-icon-image {
+  padding: 0.35rem;
+}
+
+.software-icon-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.software-icon-badge {
+  color: #fff;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.software-icon-badge span {
+  display: block;
+  font-size: 1.55rem;
+}
+
+.software-icon-midea { background: var(--red-dark); }
+.software-icon-rna { background: var(--teal); }
+.software-icon-rloop { background: #111820; }
+
+.software-card-body {
+  min-width: 0;
+}
+
+.software-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.software-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.22rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.software-card p:last-child {
+  margin: 0;
+  color: var(--muted);
+}
+
 .team-layout {
   max-width: var(--max);
   margin: 0 auto;
@@ -1822,6 +1914,7 @@ body.lightbox-open { overflow: hidden; }
   .news-grid,
   .news-list,
   .photo-gallery,
+  .software-grid,
   .member-grid { grid-template-columns: 1fr 1fr; }
   .news-list .news-card { grid-template-columns: 1fr; }
 }
@@ -1843,7 +1936,14 @@ body.lightbox-open { overflow: hidden; }
   .news-grid,
   .news-list,
   .photo-gallery,
+  .software-grid,
   .member-grid { grid-template-columns: 1fr; }
+  .software-card { grid-template-columns: 4.5rem minmax(0, 1fr); }
+  .software-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+  .software-icon-badge span { font-size: 1.1rem; }
   .section-heading { display: block; }
   .section-heading a { display: inline-block; margin-top: 0.8rem; }
   .pi-card { grid-template-columns: 1fr; }

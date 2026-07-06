@@ -18,6 +18,7 @@ https://lingroup.wordpress.ncsu.edu/
 - `assets/css/styles.css` and `assets/js/main.js` contain the site styling and mobile navigation behavior.
 - `assets/media/` contains locally downloaded WordPress images used by the pages.
 - `source/pages/publications.html` stores the locally maintained Publications page content.
+- `source/pages/software.html` stores the locally maintained Software page content.
 - `source/wordpress/` stores the WordPress API export used for this migration.
 - `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
 - `source/team-photos.json` stores local Photos gallery entries for photos that are not attached to a news post.
@@ -81,6 +82,43 @@ git push
 Local Markdown posts are combined with the older imported WordPress news posts automatically. You do not need to edit `source/wordpress/posts.json` for new posts.
 
 News images are also added to the Photos page automatically during the build when `includeImageInPhotos: true`. If a photo is attached to a news post, do not duplicate it in `source/team-photos.json`.
+
+## Adding Software
+
+1. Edit `source/pages/software.html`.
+2. Add a new `<article class="software-card">` inside `<div class="software-grid">`. Use the existing cards as the template.
+3. Link the card title and icon to the GitHub repository.
+4. If the repository has a logo, copy a web-sized image into `assets/media/software/` and use:
+
+```html
+<a class="software-icon software-icon-image" href="https://github.com/ORG/REPO" aria-label="REPO on GitHub">
+  <img src="/assets/media/software/repo-logo.png" alt="REPO logo">
+</a>
+```
+
+5. If there is no logo, use a text badge with one of the existing badge classes or add a new class in `assets/css/styles.css`:
+
+```html
+<a class="software-icon software-icon-badge software-icon-rna" href="https://github.com/ORG/REPO" aria-label="REPO on GitHub">
+  <span>RNA</span>
+</a>
+```
+
+6. If the total number of software repositories changes, update `SOFTWARE_REPOSITORY_COUNT` in `tools/build-site.mjs`.
+7. Rebuild the generated HTML from the repository root:
+
+```bash
+node tools/build-site.mjs
+```
+
+8. Commit and push the source page, any new logo assets, the CSS if changed, `tools/build-site.mjs` if the count changed, and the generated `software/index.html` and `index.html` files:
+
+```bash
+git status
+git add source/pages/software.html assets/media/software assets/css/styles.css tools/build-site.mjs software/index.html index.html
+git commit -m "Update software page"
+git push
+```
 
 ## Adding Team Photos
 
