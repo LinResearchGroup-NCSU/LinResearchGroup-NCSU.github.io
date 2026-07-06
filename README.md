@@ -87,21 +87,21 @@ News images are also added to the Photos page automatically during the build whe
 
 1. Edit `source/pages/software.html`.
 2. Add a new `<article class="software-card">` inside `<div class="software-grid">`. Use the existing cards as the template.
-3. Link the card title and icon to the GitHub repository.
-4. If the repository has a logo, copy a web-sized image into `assets/media/software/` and use:
+3. Link only the repository name in the `<h3>` to GitHub. Do not make the logo or letter mark a second link.
+4. If the repository has a logo, copy a web-sized image into `assets/media/software/` and use a decorative mark:
 
 ```html
-<a class="software-icon software-icon-image" href="https://github.com/ORG/REPO" aria-label="REPO on GitHub">
+<div class="software-mark software-mark-image">
   <img src="/assets/media/software/repo-logo.png" alt="REPO logo">
-</a>
+</div>
 ```
 
-5. If there is no logo, use a text badge with one of the existing badge classes or add a new class in `assets/css/styles.css`:
+5. If there is no logo, use a text badge with one of the existing badge classes or add a new class in `tools/build-site.mjs`:
 
 ```html
-<a class="software-icon software-icon-badge software-icon-rna" href="https://github.com/ORG/REPO" aria-label="REPO on GitHub">
+<div class="software-mark software-mark-badge software-mark-rna" aria-hidden="true">
   <span>RNA</span>
-</a>
+</div>
 ```
 
 6. If the total number of software repositories changes, update `SOFTWARE_REPOSITORY_COUNT` in `tools/build-site.mjs`.
@@ -111,7 +111,7 @@ News images are also added to the Photos page automatically during the build whe
 node tools/build-site.mjs
 ```
 
-8. Commit and push the source page, any new logo assets, the CSS if changed, `tools/build-site.mjs` if the count changed, and the generated `software/index.html` and `index.html` files:
+8. Commit and push the source page, any new logo assets, the generated CSS, `tools/build-site.mjs` if the count or styles changed, and the generated `software/index.html` and `index.html` files:
 
 ```bash
 git status

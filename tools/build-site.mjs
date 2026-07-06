@@ -11,7 +11,7 @@ const MAP_MY_VISITORS_SCRIPT_URL = "https://mapmyvisitors.com/map.js?d=1QVpVId2s
 const FILE_RE = /https:\/\/lingroup\.wordpress\.ncsu\.edu\/files\/[^"'()\s<>]+/g;
 const HOME_INTRO =
   "Our research group is situated within the Department of Physics and the Bioinformatics Research Center of North Carolina State University. By synergizing simulation and data-driven approaches, we are committed to building innovative computational models to answer crucial questions in the realm of genome and epigenome.";
-const SOFTWARE_REPOSITORY_COUNT = 5;
+const SOFTWARE_REPOSITORY_COUNT = 8;
 
 const pages = JSON.parse(fs.readFileSync(path.join(SOURCE, "pages.json"), "utf8"));
 const wordpressPosts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
@@ -1404,7 +1404,7 @@ body.lightbox-open { overflow: hidden; }
 }
 
 .software-page .wordpress-content {
-  max-width: 1020px;
+  max-width: 1040px;
 }
 
 .software-intro {
@@ -1415,76 +1415,78 @@ body.lightbox-open { overflow: hidden; }
 .software-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 .software-card {
   display: grid;
-  grid-template-columns: 6rem minmax(0, 1fr);
-  gap: 1rem;
+  grid-template-columns: 3.75rem minmax(0, 1fr);
+  gap: 0.8rem;
   align-items: start;
   min-height: 100%;
-  padding: 1rem;
+  padding: 0.8rem;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 10px 28px rgba(24, 32, 42, 0.06);
+  box-shadow: 0 6px 18px rgba(24, 32, 42, 0.05);
 }
 
-.software-icon {
+.software-mark {
   display: grid;
   place-items: center;
-  width: 6rem;
-  height: 6rem;
+  width: 3.75rem;
+  height: 3.75rem;
   border: 1px solid rgba(24, 32, 42, 0.12);
   border-radius: 8px;
   overflow: hidden;
-  text-decoration: none;
   background: var(--wash);
 }
 
-.software-icon-image {
-  padding: 0.35rem;
+.software-mark-image {
+  padding: 0.25rem;
 }
 
-.software-icon-image img {
+.software-mark-image img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.software-icon-badge {
+.software-mark-badge {
   color: #fff;
   font-weight: 900;
   line-height: 1;
 }
 
-.software-icon-badge span {
+.software-mark-badge span {
   display: block;
-  font-size: 1.55rem;
+  font-size: 1rem;
 }
 
-.software-icon-midea { background: var(--red-dark); }
-.software-icon-rna { background: var(--teal); }
-.software-icon-rloop { background: #111820; }
+.software-mark-midea { background: var(--red-dark); }
+.software-mark-rna { background: var(--teal); }
+.software-mark-rloop { background: #111820; }
+.software-mark-racer { background: var(--gold); }
+.software-mark-pc { background: #5b6677; }
+.software-mark-chromatin { background: #6a3f7a; }
 
 .software-card-body {
   min-width: 0;
 }
 
 .software-kicker {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.2rem;
   color: var(--gold);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0;
 }
 
 .software-card h3 {
-  margin: 0 0 0.45rem;
-  font-size: 1.22rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -1492,6 +1494,8 @@ body.lightbox-open { overflow: hidden; }
 .software-card p:last-child {
   margin: 0;
   color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.45;
 }
 
 .team-layout {
@@ -1938,12 +1942,15 @@ body.lightbox-open { overflow: hidden; }
   .photo-gallery,
   .software-grid,
   .member-grid { grid-template-columns: 1fr; }
-  .software-card { grid-template-columns: 4.5rem minmax(0, 1fr); }
-  .software-icon {
-    width: 4.5rem;
-    height: 4.5rem;
+  .software-card {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    padding: 0.75rem;
   }
-  .software-icon-badge span { font-size: 1.1rem; }
+  .software-mark {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+  .software-mark-badge span { font-size: 0.92rem; }
   .section-heading { display: block; }
   .section-heading a { display: inline-block; margin-top: 0.8rem; }
   .pi-card { grid-template-columns: 1fr; }
