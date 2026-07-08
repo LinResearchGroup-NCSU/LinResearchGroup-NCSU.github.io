@@ -85,6 +85,7 @@ const teamData = {
     {
       name: "Hexuan (Hillbert) Fan",
       program: "2025 Bioinformatics",
+      email: "hfan7@ncsu.edu",
       photo: "https://lingroup.wordpress.ncsu.edu/files/2025/12/e33e138afd3de58059d8537d5fcadbd4-683x1024.jpg",
     },
     {
