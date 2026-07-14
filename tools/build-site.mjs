@@ -121,6 +121,10 @@ const teamData = {
     {
       name: "Thomas Thornton",
       information: "2022 Physics Undergraduate; Research period: 2023-2026; Now Ph.D. in Physics, Northwestern University",
+      recognition: {
+        label: "McCormick Award",
+        url: "https://linresearchgroup-ncsu.github.io/news/thomas-wins-mccormick-award/",
+      },
       exitYear: "2026",
     },
     {
@@ -882,10 +886,13 @@ function buildTeamPage() {
           const email = alum.email
             ? `<a href="mailto:${escapeHtml(alum.email)}">${escapeHtml(alum.email)}</a>`
             : "";
+          const recognition = alum.recognition
+            ? `; <a href="${escapeHtml(alum.recognition.url)}">${escapeHtml(alum.recognition.label)}</a> recipient`
+            : "";
           const emailHtml = email ? `\n            ${email}` : "";
           return `<li>
             <strong>${escapeHtml(alum.name)}</strong>
-            <span>${escapeHtml(alum.information)}</span>${emailHtml}
+            <span>${escapeHtml(alum.information)}${recognition}</span>${emailHtml}
           </li>`;
         })
         .join("");
