@@ -461,6 +461,7 @@ body.lightbox-open { overflow: hidden; }
 .software-mark-racer { background: var(--gold); }
 .software-mark-pc { background: #5b6677; }
 .software-mark-chromatin { background: #6a3f7a; }
+.software-mark-nucl { background: #2f6f4e; }
 
 .software-card-body {
   min-width: 0;

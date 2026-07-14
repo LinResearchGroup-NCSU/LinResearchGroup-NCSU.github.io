@@ -11,7 +11,7 @@ const MAP_MY_VISITORS_SCRIPT_URL = "https://mapmyvisitors.com/map.js?d=1QVpVId2s
 const FILE_RE = /https:\/\/lingroup\.wordpress\.ncsu\.edu\/files\/[^"'()\s<>]+/g;
 const HOME_INTRO =
   "Our research group is situated within the Department of Physics and the Bioinformatics Research Center of North Carolina State University. By synergizing simulation and data-driven approaches, we are committed to building innovative computational models to answer crucial questions in the realm of genome and epigenome.";
-const SOFTWARE_REPOSITORY_COUNT = 8;
+const SOFTWARE_REPOSITORY_COUNT = 9;
 
 const pages = JSON.parse(fs.readFileSync(path.join(SOURCE, "pages.json"), "utf8"));
 const wordpressPosts = JSON.parse(fs.readFileSync(path.join(SOURCE, "posts.json"), "utf8"));
@@ -1471,6 +1471,7 @@ body.lightbox-open { overflow: hidden; }
 .software-mark-racer { background: var(--gold); }
 .software-mark-pc { background: #5b6677; }
 .software-mark-chromatin { background: #6a3f7a; }
+.software-mark-nucl { background: #2f6f4e; }
 
 .software-card-body {
   min-width: 0;
