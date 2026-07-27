@@ -20,6 +20,7 @@ https://lingroup.wordpress.ncsu.edu/
 - `source/pages/research.html` stores the locally maintained Research Topics page content.
 - `source/pages/publications.html` stores the locally maintained Publications page content.
 - `source/pages/software.html` stores the locally maintained Software page content.
+- `source/pages/positions.html` stores the locally maintained Positions page content.
 - `source/wordpress/` stores the WordPress API export used for this migration.
 - `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
 - `source/team-photos.json` stores local Photos gallery entries for photos that are not attached to a news post.
@@ -131,6 +132,25 @@ node tools/build-site.mjs
 git status
 git add source/pages/software.html assets/media/software assets/css/styles.css tools/build-site.mjs software/index.html index.html
 git commit -m "Update software page"
+git push
+```
+
+## Updating Positions
+
+1. Edit `source/pages/positions.html`.
+2. Keep current openings near the top of the page, followed by general Graduate Students and Undergraduate Students notes.
+3. Rebuild the generated HTML from the repository root:
+
+```bash
+node tools/build-site.mjs
+```
+
+4. Commit and push both the source page and generated Positions page:
+
+```bash
+git status
+git add source/pages/positions.html positions/index.html README.md
+git commit -m "Update positions"
 git push
 ```
 
