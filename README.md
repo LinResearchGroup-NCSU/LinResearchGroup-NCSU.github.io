@@ -17,12 +17,26 @@ https://lingroup.wordpress.ncsu.edu/
 - `news/` contains generated news HTML pages that GitHub Pages serves.
 - `assets/css/styles.css` and `assets/js/main.js` contain the site styling and mobile navigation behavior.
 - `assets/media/` contains locally downloaded WordPress images used by the pages.
+- `source/pages/research.html` stores the locally maintained Research Topics page content.
 - `source/pages/publications.html` stores the locally maintained Publications page content.
 - `source/pages/software.html` stores the locally maintained Software page content.
 - `source/wordpress/` stores the WordPress API export used for this migration.
 - `source/news/posts/` stores hand-authored Markdown news posts that are independent from WordPress.
 - `source/team-photos.json` stores local Photos gallery entries for photos that are not attached to a news post.
 - `tools/build-site.mjs` regenerates the static pages from the WordPress export, local page overrides, local news posts, and local photo entries.
+
+## Updating Research Topics
+
+1. Edit `source/pages/research.html`.
+2. Add new topics as `<h2 class="wp-block-heading">` sections. Place the newest or highest-priority topic near the top of the file.
+3. Put research figures under `assets/media/research/` and reference them with root-relative paths such as `/assets/media/research/figure-name.png`.
+4. Rebuild the generated HTML from the repository root:
+
+```bash
+node tools/build-site.mjs
+```
+
+5. Commit and push the source page, figure assets, generated `research/index.html`, and generated `index.html` if the homepage topic cards changed.
 
 ## Updating Publications
 

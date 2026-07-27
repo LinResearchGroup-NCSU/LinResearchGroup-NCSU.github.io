@@ -579,7 +579,7 @@ function shell({ title, description, bodyClass = "", children, pathName = "/" })
 }
 
 function extractResearchCards() {
-  const research = rewriteLinks(pageBySlug.get("research").content.rendered || "");
+  const research = pageContent("research");
   const sections = [...research.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>([\s\S]*?)(?=<h2|$)/gi)];
   return sections.map((match) => ({
     title: stripTags(match[1]),
@@ -613,7 +613,8 @@ function buildHome() {
   const home = pageBySlug.get("home");
   const heroImage = mediaUrlFromOld(firstImage(home.content.rendered));
   const intro = HOME_INTRO;
-  const researchCards = extractResearchCards()
+  const researchCardData = extractResearchCards();
+  const researchCards = researchCardData
     .map((card) => `<article class="topic-card"><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.excerpt)}</p></article>`)
     .join("");
   const latestNews = posts.slice(0, 3).map(postCard).join("");
@@ -632,7 +633,7 @@ function buildHome() {
   </section>
 
   <section class="overview-band">
-    <div class="metric"><strong>3</strong><span>Research themes</span></div>
+    <div class="metric"><strong>${researchCardData.length}</strong><span>Research themes</span></div>
     <div class="metric"><strong>${posts.length}</strong><span>News updates</span></div>
     <div class="metric"><strong>${SOFTWARE_REPOSITORY_COUNT}</strong><span>Software repositories</span></div>
   </section>
