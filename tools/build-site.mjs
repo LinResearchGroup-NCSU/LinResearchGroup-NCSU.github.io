@@ -69,24 +69,35 @@ const teamData = {
       program: "2023 Bioinformatics",
       email: "yzhan326@ncsu.edu",
       photo: "https://lingroup.wordpress.ncsu.edu/files/2024/02/Picture1-150x150.jpg",
+      linkedin: "https://www.linkedin.com/in/yafan-zhang-57b6062b2/",
     },
     {
-      name: "Eduardo Cisneros",
+      name: "Eduardo Cisneros De La Rosa",
       program: "2023 Bioinformatics",
       email: "eacisner@ncsu.edu",
       photo: "https://lingroup.wordpress.ncsu.edu/files/2024/02/77726107-0836-45B0-9428-D2DBB894C3C5_1_105_c-150x150.jpeg",
+      linkedin: "https://www.linkedin.com/in/eduardo-cisneros-de-la-rosa/",
     },
     {
       name: "Irene Silvernail",
       program: "2023 Physics",
       email: "insilver@ncsu.edu",
       photo: "https://lingroup.wordpress.ncsu.edu/files/2024/07/image-150x150.png",
+      linkedin: "https://www.linkedin.com/in/irene-silvernail-7448a3376/",
     },
     {
       name: "Hexuan (Hillbert) Fan",
       program: "2025 Bioinformatics",
       email: "hfan7@ncsu.edu",
       photo: "https://lingroup.wordpress.ncsu.edu/files/2025/12/e33e138afd3de58059d8537d5fcadbd4-683x1024.jpg",
+    },
+    {
+      name: "Hongxuan Li",
+      program: "2026 Lampe Biomedical Engineering",
+      photo: "/assets/media/team/hongxuan-li.jpg",
+      fullPhoto: "/assets/media/team/full/hongxuan-li.jpg",
+      linkedin: "https://www.linkedin.com/in/hongxuan-li-380b02299/",
+      note: 'Co-mentored with <a href="https://cs.unc.edu/person/tianlong-chen/" rel="noopener">Dr. Tianlong Chen</a>',
     },
     {
       name: "Zahra Ghoreyshi",
@@ -850,7 +861,7 @@ function memberCard(member) {
   return `<article class="member-card">
     ${photoLightboxLink({
       thumb: mediaUrlFromOld(member.photo),
-      full: fullMediaUrlFromOld(member.photo),
+      full: member.fullPhoto ? mediaUrlFromOld(member.fullPhoto) : fullMediaUrlFromOld(member.photo),
       alt: member.name,
       className: photoClass,
     })}
